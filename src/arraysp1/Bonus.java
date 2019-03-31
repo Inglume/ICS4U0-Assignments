@@ -8,17 +8,46 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 /**
- * The Bonus class a
+ * The Bonus class takes a 1 - 4 digit phone number and searches for all words corresponding with it
+ * in a dictionary.
  * 
  * @author Inglume
  */
+
 public class Bonus {
 
+  /**
+   * Dictionary containing all words from DICT.TXT.
+   */
   HashSet<String> dict;
+
+  /**
+   * Contains letters corresponding to numbers on number pad.
+   */
   final char[][] numChar =
       {{}, {}, {'a', 'b', 'c'}, {'d', 'e', 'f'}, {'g', 'h', 'i'}, {'j', 'k', 'l'}, {'m', 'n', 'o'},
           {'p', 'q', 'r', 's'}, {'t', 'u', 'v'}, {'w', 'x', 'y', 'z'}};
 
+  /**
+   * Digits in phone number inputted by user.
+   */
+  int[] digits;
+
+  /**
+   * Length of digits.
+   */
+  int len;
+
+  /**
+   * Is true iff at least one word has been found for phone number
+   */
+  boolean found;
+
+  /**
+   * Loads dictionary with words from DICT.TXT.
+   * 
+   * @return dict - HashSet containing all words from DICT.TXT.
+   */
   private HashSet<String> loadDict() {
     HashSet<String> dict = new HashSet<>();
     try {
@@ -27,89 +56,126 @@ public class Bonus {
       while ((in = br.readLine()) != null) {
         dict.add(in);
       }
-      // System.out.println(dict.size());
     } catch (IOException e) {
       e.printStackTrace();
     }
     return dict;
   }
 
+  /**
+   * Prompts for and parses phone number.
+   * 
+   * @return phoneNumber - result of input. Will be 1 - 4 digit long integer not including 0 or 1,
+   *         or -1.
+   */
   private int parsePhoneNumber() {
     Scanner sc = new Scanner(System.in);
     int phoneNumber = 0;
     while (phoneNumber < 1 || phoneNumber > 9999) {
       try {
-        System.out.print("Enter a phone number containing 1 - 4 digits (not including 0): ");
-        phoneNumber = sc.nextInt();
+        System.out.print(
+            "Enter a phone number containing 1 - 4 digits (not including 0 or 1, enter '-1' to quit): ");
+        if ((phoneNumber = sc.nextInt()) == -1) {
+          return -1;
+        }
         int temp = phoneNumber;
         while (temp > 0) {
           if (temp % 10 == 0 || temp % 10 == 1) {
-            System.out.println();
             System.out.println("ERROR: Invalid input, try again.");
-            continue;
+            phoneNumber = 0;
+            break;
           }
           temp /= 10;
         }
       } catch (NumberFormatException e) {
-        System.out.println();
         System.out.println("ERROR: Invalid input, try again.");
+        phoneNumber = 0;
       }
     }
-    sc.close();
     return phoneNumber;
   }
 
+  /**
+   * Prints the search string if it is found in the dictionary.
+   * 
+   * @param search - the string to be searched in the dictionary
+   */
   private void printExists(String search) {
     if (dict.contains(search)) {
       System.out.println(search);
+      found = true;
     }
   }
 
-  private void check(int[] digits, int len, int count, String search) {
+  /**
+   * The first call of the recursive check method without params (same as calling
+   * {@link #check(int, String) check} method with params (0, "")).
+   */
+  private void check() {
+    for (char c : numChar[digits[0]]) {
+      String search = "" + c;
+      if (1 == len) {
+        printExists(search);
+      } else {
+        check(1, search);
+      }
+    }
+  }
+
+  /**
+   * The method used following the initial call of check() without params
+   * 
+   * @param count - counts the depth of the recursion
+   * @param search - the string to be searched in the dictionary
+   */
+  private void check(int count, String search) {
     for (char c : numChar[digits[count]]) {
       search = search + c;
       if (count == len - 1) {
         printExists(search);
-        // System.out.println("bad: " + search);
       } else {
-        check(digits, len, count + 1, search);
+        check(count + 1, search);
       }
       search = search.substring(0, search.length() - 1);
     }
   }
 
+  /**
+   * Default constructor.
+   */
   public Bonus() {
     dict = loadDict();
+    int phoneNumber = 0;
+    while (phoneNumber != -1) {
+      if ((phoneNumber = parsePhoneNumber()) == -1) {
+        return;
+      }
 
-    // Get current time
-    long start = System.currentTimeMillis();
+      // Get current time
+      long start = System.currentTimeMillis();
 
-    int phoneNumber = parsePhoneNumber();
-    int len = (int) (Math.log10(phoneNumber) + 1);
-    int[] digits = new int[len];
+      len = (int) (Math.log10(phoneNumber) + 1);
+      digits = new int[len];
+      for (int i = 0; i < len; i++) {
+        digits[i] = (phoneNumber / (int) Math.pow(10, len - i - 1)) % 10;
+      }
 
-    for (int i = 0; i < len; i++) {
-      digits[i] = (phoneNumber / (int) Math.pow(10, len - i - 1)) % 10;
-      // System.out.println(digits[i]);
+      check();
+
+      if (!found) {
+        System.out.println("No words could be found");
+      } else {
+        found = false;
+      }
+
+      // Get elapsed time in milliseconds
+      long elapsedTimeMillis = System.currentTimeMillis() - start;
+
+      // Get elapsed time in seconds
+      float elapsedTimeSec = elapsedTimeMillis / 1000F;
+
+      System.out.println("Elapsed time (ms) : " + elapsedTimeMillis);
     }
-
-    // int d1 = 0, d2 = 0, d3 = 0, d4 = 0;
-    // d1 = phoneNumber / 1000;
-    // d2 = (phoneNumber / 100) % 10;
-    // d3 = (phoneNumber / 10) % 10;
-    // d4 = phoneNumber % 10;
-    // System.out.printf("%d %d %d %d", d1, d2, d3, d4);
-    // System.out.printf("%d %d %d %d", d1, d2, d3, d4);
-
-    check(digits, len, 0, "");
-
-    // Get elapsed time in milliseconds
-    long elapsedTimeMillis = System.currentTimeMillis() - start;
-
-    // Get elapsed time in seconds
-    float elapsedTimeSec = elapsedTimeMillis / 1000F;
-
-    System.out.println("Elapsed time (s) : " + elapsedTimeSec);
   }
 
 }

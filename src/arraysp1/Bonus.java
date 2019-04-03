@@ -1,7 +1,6 @@
 package arraysp1;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import java.util.Scanner;
  * The Bonus class takes a 1 - 4 digit phone number and searches for all words corresponding with it
  * in a dictionary.
  * 
- * @author Inglume
+ * @author Nicholas Glenn
  */
 
 public class Bonus {
@@ -19,39 +18,39 @@ public class Bonus {
   /**
    * Dictionary containing all words from DICT.TXT.
    */
-  HashSet<String> dict;
+  static HashSet<String> dict;
 
   /**
    * Contains letters corresponding to numbers on number pad.
    */
-  final char[][] numChar =
+  static final char[][] NUMPAD =
       {{}, {}, {'a', 'b', 'c'}, {'d', 'e', 'f'}, {'g', 'h', 'i'}, {'j', 'k', 'l'}, {'m', 'n', 'o'},
           {'p', 'q', 'r', 's'}, {'t', 'u', 'v'}, {'w', 'x', 'y', 'z'}};
 
   /**
    * Digits in phone number inputted by user.
    */
-  int[] digits;
+  static int[] digits;
 
   /**
    * Length of digits.
    */
-  int len;
+  static int len;
 
   /**
-   * Is true iff at least one word has been found for phone number
+   * Is true iff at least one word has been found for phone number.
    */
-  boolean found;
+  static boolean found;
 
   /**
    * Loads dictionary with words from DICT.TXT.
    * 
    * @return dict - HashSet containing all words from DICT.TXT.
    */
-  private HashSet<String> loadDict() {
+  private static HashSet<String> loadDict() {
     HashSet<String> dict = new HashSet<>();
     try {
-      BufferedReader br = new BufferedReader(new FileReader(new File("src/arraysp1/DICT.TXT")));
+      BufferedReader br = new BufferedReader(new FileReader("src/arraysp1/DICT.TXT"));
       String in;
       while ((in = br.readLine()) != null) {
         dict.add(in);
@@ -68,7 +67,7 @@ public class Bonus {
    * @return phoneNumber - result of input. Will be 1 - 4 digit long integer not including 0 or 1,
    *         or -1.
    */
-  private int parsePhoneNumber() {
+  private static int parsePhoneNumber() {
     Scanner sc = new Scanner(System.in);
     int phoneNumber = 0;
     while (phoneNumber < 1 || phoneNumber > 9999) {
@@ -100,20 +99,26 @@ public class Bonus {
    * 
    * @param search - the string to be searched in the dictionary
    */
-  private void printExists(String search) {
+  private static void printExists(String search) {
     if (dict.contains(search)) {
       System.out.println(search);
+      found = true;
+    } else if (dict.contains(search.toLowerCase())) {
+      System.out.println(search.toLowerCase());
+      found = true;
+    } else if (dict.contains(search.toUpperCase())) {
+      System.out.println(search.toUpperCase());
       found = true;
     }
   }
 
   /**
-   * The first call of the recursive check method without params (same as calling
-   * {@link #check(int, String) check} method with params (0, "")).
+   * The first call of the recursive check method without params. Adds the first character as a
+   * capital letter.
    */
-  private void check() {
-    for (char c : numChar[digits[0]]) {
-      String search = "" + c;
+  private static void check() {
+    for (char c : NUMPAD[digits[0]]) {
+      String search = "" + (char) (c - 32);
       if (1 == len) {
         printExists(search);
       } else {
@@ -123,13 +128,13 @@ public class Bonus {
   }
 
   /**
-   * The method used following the initial call of check() without params
+   * The method used following the initial call of check() without params.
    * 
    * @param count - counts the depth of the recursion
    * @param search - the string to be searched in the dictionary
    */
-  private void check(int count, String search) {
-    for (char c : numChar[digits[count]]) {
+  private static void check(int count, String search) {
+    for (char c : NUMPAD[digits[count]]) {
       search = search + c;
       if (count == len - 1) {
         printExists(search);
@@ -141,9 +146,11 @@ public class Bonus {
   }
 
   /**
-   * Default constructor.
+   * Main method. Runs everything and counts time elapsed.
+   * 
+   * @param args - Command-line arguments
    */
-  public Bonus() {
+  public static void main(String args[]) {
     dict = loadDict();
     int phoneNumber = 0;
     while (phoneNumber != -1) {
@@ -151,8 +158,7 @@ public class Bonus {
         return;
       }
 
-      // Get current time
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
 
       len = (int) (Math.log10(phoneNumber) + 1);
       digits = new int[len];
@@ -168,13 +174,9 @@ public class Bonus {
         found = false;
       }
 
-      // Get elapsed time in milliseconds
-      long elapsedTimeMillis = System.currentTimeMillis() - start;
+      double elapsedTimeMillis = (double) (System.nanoTime() - start) / 1000000;
 
-      // Get elapsed time in seconds
-      float elapsedTimeSec = elapsedTimeMillis / 1000F;
-
-      System.out.println("Elapsed time (ms) : " + elapsedTimeMillis);
+      System.out.printf("Elapsed time (ms) : %f\n", elapsedTimeMillis);
     }
   }
 

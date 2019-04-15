@@ -74,16 +74,10 @@ public class RecursionB {
    * @return true iff the exit has been found
    */
   private static boolean dfs(int[][] maze, boolean[][] visited, int row, int col) {
-    if (!isSafe(maze, row, col)) {
-      return false;
-    }
-    if (visited[row][col]) {
+    if (!isValid(maze, visited, row, col)) {
       return false;
     }
     visited[row][col] = true;
-    if (maze[row][col] == 1) {
-      return false;
-    }
     if (row == maze.length - 1) {
       return true;
     }
@@ -92,15 +86,19 @@ public class RecursionB {
   }
 
   /**
-   * Checks if the coordinates are within the boundaries of the maze.
+   * Checks if the coordinates can be searched.
    * 
    * @param maze - the maze to search
+   * @param visited - a 2d array showing which indices have already been visited (to avoid infinite
+   *        loops)
    * @param row - the row that is being searched
    * @param col - the column that is being searched
-   * @return true if the coordinates are within bounds of the maze
+   * @return true if the coordinates are within bounds of the maze and have not been visited and are
+   *         traversable (not a wall).
    */
-  private static boolean isSafe(int[][] maze, int row, int col) {
-    return row >= 0 && row < maze.length && col >= 0 && col < maze.length;
+  private static boolean isValid(int[][] maze, boolean[][] visited, int row, int col) {
+    return row >= 0 && row < maze.length && col >= 0 && col < maze.length && !visited[row][col]
+        && maze[row][col] == 0;
   }
 
   /**
@@ -109,9 +107,14 @@ public class RecursionB {
    * @param args - command-line arguments
    */
   public static void main(String[] args) {
-    String[] words = new String[] {"aardvark", "baby", "calf", "dream", "elephant"};
-    int[][] maze = new int[][] {{0, 0, 1, 0, 1}, {1, 0, 0, 0, 0}, {1, 0, 1, 0, 0}, {1, 0, 0, 1, 1},
-        {1, 1, 0, 1, 1}};
+    Comparable[] words = new String[] {"aardvark", "baby", "calf", "dream", "elephant"};
+    Comparable[] nums = new Integer[] {1, 3, 2, 11, 3};
+    int[][] maze = new int[][] {
+      {0, 0, 1, 0, 1},
+      {1, 0, 1, 0, 0},
+      {1, 0, 1, 0, 0},
+      {1, 1, 0, 0, 1},
+      {1, 1, 0, 1, 1}};
 
     // Input for revString()
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -130,6 +133,7 @@ public class RecursionB {
     System.out.printf("Reversed Number: %d -> %d\n", 4, revDigits(4));
     System.out.printf("Search Item: %s -> %s\n", "calf", searchItem(words, "calf"));
     System.out.printf("Search Item: %s -> %s\n", "cow", searchItem(words, "cow"));
+    System.out.printf("Search Item: %s -> %s\n", 5, searchItem(nums, 5));
     System.out.printf("Is there a path in the maze? %s\n", traverseMaze(maze));
   }
 

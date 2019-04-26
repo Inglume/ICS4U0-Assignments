@@ -3,7 +3,7 @@ package deckofcards;
 /**
  * The Card class
  * 
- * @author Inglume
+ * @author Nicholas Glenn
  */
 public class Card {
 

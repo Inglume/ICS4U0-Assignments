@@ -1,11 +1,12 @@
 package deckofcards;
 
-// Conlon
-// composition
-// client code for Deck of Cards
-
 import java.util.Scanner;
 
+/**
+ * The DeckCardsClient class
+ * 
+ * @author Nicholas Glenn
+ */
 public class DeckCardsClient {
 
   public static void main(String[] args) {

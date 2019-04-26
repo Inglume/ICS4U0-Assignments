@@ -27,6 +27,11 @@ public class Locker {
    */
   private Book books[];
 
+  /**
+   * Default constructor.
+   * 
+   * @param me - the Locker owner
+   */
   public Locker(Student me) {
     number = (int) (Math.random() * 10000);
     owner = me;
@@ -43,10 +48,10 @@ public class Locker {
   }
 
   /**
+   * Gets a book from the Locker.
    * 
-   * 
-   * @param course
-   * @return
+   * @param course - the course type of the book to get
+   * @return Book of the specified course
    */
   public Book getABook(String course) {
     for (int i = 0; i < books.length; i++) {
@@ -95,18 +100,18 @@ public class Locker {
   /**
    * Checks the status of jacket.
    * 
-   * @return studentJacket
+   * @return studentJacket - the Jacket in the Locker
    */
   public Jacket checkJacket() {
     return studentJacket;
   }
 
   /**
+   * Puts jacket into the locker.
    * 
-   * 
-   * @param thisJacket
+   * @param thisJacket - the Jacket to put
    */
-  public void putAJacket(Jacket thisJacket) {
+  public void putJacket(Jacket thisJacket) {
     studentJacket = new Jacket(thisJacket.owner);
     thisJacket.owner.myJacket = null;
   }

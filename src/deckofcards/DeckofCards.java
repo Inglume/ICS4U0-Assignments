@@ -1,9 +1,10 @@
 package deckofcards;
 
-// Conlon
-// composition example
-// object code
-
+/**
+ * The DeckofCards Class
+ * 
+ * @author Nicholas Glenn
+ */
 public class DeckofCards {
 
   private Card myDeck[];
